@@ -1,5 +1,6 @@
 ARG SPARK_IMAGE=gcr.io/spark-operator/spark:v3.0.0
 FROM ${SPARK_IMAGE}
+USER root
 
 # Add the connector jar needed to access Google Cloud Storage using the Hadoop FileSystem API.
 ADD https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-latest-hadoop2.jar $SPARK_HOME/jars
@@ -13,5 +14,10 @@ ADD https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws
 ADD https://repo1.maven.org/maven2/com/microsoft/azure/azure-storage/2.0.0/azure-storage-2.0.0.jar $SPARK_HOME/jars
 # Add hadoop-azure to access Azure Blob Storage
 ADD https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-azure/2.7.3/hadoop-azure-2.7.3.jar $SPARK_HOME/jars
+
+RUN groupadd -g 185 spark && \
+    useradd -u 185 -g 185 spark
+
+USER 185
 
 ENTRYPOINT ["/opt/entrypoint.sh"]
